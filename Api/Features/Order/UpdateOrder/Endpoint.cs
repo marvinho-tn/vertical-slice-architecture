@@ -13,7 +13,7 @@ namespace Api.Features.Order.UpdateOrder
 
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
-            var entity = dbContext.GetById<OrderEntity>("Orders", req.Id);
+            var entity = dbContext.GetById<OrderEntity>(Constants.OrdersCollectionName, req.Id);
 
             entity.Client.Name = req.Client;
             entity.Items = req.Items.Select(x => new OrderItemEntity
@@ -22,7 +22,7 @@ namespace Api.Features.Order.UpdateOrder
             }).ToArray();
             entity.Updated = DateTime.UtcNow;
 
-            dbContext.Update("Orders", entity.Id, entity);
+            dbContext.Update(Constants.OrdersCollectionName, entity.Id, entity);
 
             var response = Map.FromEntity(entity);
 

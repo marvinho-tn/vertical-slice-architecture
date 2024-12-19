@@ -13,7 +13,7 @@ namespace Api.Features.Order.ListOrders
 
         public override async Task HandleAsync(Request request, CancellationToken cancellationToken)
         {
-            var orders = dbContext.GetAll<OrderEntity>("Orders", request.Page, request.PageSize);
+            var orders = dbContext.GetAll<OrderEntity>(Constants.OrdersCollectionName, request.Page, request.PageSize);
             var response = orders.Select(Map.FromEntity);
 
             await SendAsync(response);

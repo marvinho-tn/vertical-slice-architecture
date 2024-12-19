@@ -19,7 +19,7 @@ namespace Api.Features.Order.CreateOrder
             entity.Created = DateTime.UtcNow;
             entity.Updated = DateTime.UtcNow;
 
-            dbContext.Add("Orders", entity);
+            dbContext.Add(Constants.OrdersCollectionName, entity);
 
             var response = Map.FromEntity(entity);
 
