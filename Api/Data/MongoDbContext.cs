@@ -20,6 +20,22 @@ namespace Api.Data
 
             collection.InsertOne(entity);
         }
+
+        public void Update<T>(string collectionName, string id, T entity) where T : class
+        {
+            var collection = _database.GetCollection<T>(collectionName);
+            var filter = Builders<T>.Filter.Eq("_id", id);
+
+            collection.ReplaceOne(filter, entity);
+        }
+
+        public T GetById<T>(string collectionName, string id) where T : class
+        {
+            var collection = _database.GetCollection<T>(collectionName);
+            var filter = Builders<T>.Filter.Eq("Id", id);
+
+            return collection.Find(filter).FirstOrDefault();
+        }
     }
 
     public class MongoDbSettings

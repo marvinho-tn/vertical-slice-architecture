@@ -1,29 +1,32 @@
 ﻿using Api.Data;
 using FastEndpoints;
 
-namespace Api.Features.Order.CreateOrder
+namespace Api.Features.Order.UpdateOrder
 {
     internal sealed class Endpoint(MongoDbContext dbContext) : Endpoint<Request, Response, Mapper>
     {
         public override void Configure()
         {
-            Post("/orders");
+            Put("/orders/{Id}");
             AllowAnonymous();
         }
 
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
-            var entity = Map.ToEntity(req);
+            var entity = dbContext.GetById<OrderEntity>("Orders", req.Id);
 
-            entity.Id = Guid.NewGuid().ToString();
-            entity.Created = DateTime.UtcNow;
+            entity.Client.Name = req.Client;
+            entity.Items = req.Items.Select(x => new OrderItemEntity
+            {
+                Name = x
+            }).ToArray();
             entity.Updated = DateTime.UtcNow;
 
-            dbContext.Add("Orders", entity);
+            dbContext.Update("Orders", entity.Id, entity);
 
             var response = Map.FromEntity(entity);
 
-            await SendAsync(response, 201);
+            await SendAsync(response, 200);
         }
     }
 }
