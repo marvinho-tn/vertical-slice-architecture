@@ -36,6 +36,13 @@ namespace Api.Data
 
             return collection.Find(filter).FirstOrDefault();
         }
+
+        public List<T> GetAll<T>(string collectionName, int page, int pageSize) where T : class
+        {
+            var collection = _database.GetCollection<T>(collectionName);
+
+            return collection.Find(Builders<T>.Filter.Empty).Skip((page - 1) * pageSize).Limit(pageSize).ToList();
+        }
     }
 
     public class MongoDbSettings
