@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api.csproj", "{4CF8D495-482E-4B5E-9160-491C42419616}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YARP", "..\YARP\YARP.csproj", "{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{4CF8D495-482E-4B5E-9160-491C42419616}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CF8D495-482E-4B5E-9160-491C42419616}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CF8D495-482E-4B5E-9160-491C42419616}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
