@@ -1,4 +1,4 @@
-﻿using Orders.Api.Data;
+﻿using Common.Data;
 using FastEndpoints;
 
 namespace Orders.Api.Features.Order.CreateOrder

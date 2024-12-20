@@ -3,7 +3,7 @@ using MongoDB.Bson;
 
 namespace Orders.Api.Features.Order
 {
-    internal sealed class OrderEntity
+    internal sealed record OrderEntity
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
@@ -14,12 +14,12 @@ namespace Orders.Api.Features.Order
         public OrderItemEntity[] Items { get; set; }
     }
 
-    internal sealed class OrderItemEntity
+    internal sealed record OrderItemEntity
     {
         public string Name { get; set; }
     }
 
-    internal sealed class OrderClientEntity
+    internal sealed record OrderClientEntity
     {
         public string Name { get; set; }
     }

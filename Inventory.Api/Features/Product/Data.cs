@@ -2,7 +2,7 @@
 
 namespace Inventory.Api.Features.Product
 {
-    internal sealed class ProductEntity
+    internal sealed record ProductEntity
     {
         [BsonId]
         [BsonRepresentation(MongoDB.Bson.BsonType.String)]

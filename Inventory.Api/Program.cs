@@ -1,5 +1,5 @@
 using FastEndpoints;
-using Orders.Api.Data;
+using Common.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

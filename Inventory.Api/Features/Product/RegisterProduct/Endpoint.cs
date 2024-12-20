@@ -1,5 +1,5 @@
 ﻿using FastEndpoints;
-using Orders.Api.Data;
+using Common.Data;
 
 namespace Inventory.Api.Features.Product.RegisterProduct
 {
@@ -17,7 +17,7 @@ namespace Inventory.Api.Features.Product.RegisterProduct
 
             entity.Id = Guid.NewGuid().ToString();
 
-            dbContext.Add("Products", entity);
+            dbContext.Add(Constants.ProductsCollectionName, entity);
 
             var response = Map.FromEntity(entity);
 

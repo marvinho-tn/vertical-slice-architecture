@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace Orders.Api.Data
+namespace Common.Data
 {
     public class MongoDbContext
     {
@@ -50,6 +50,14 @@ namespace Orders.Api.Data
             var collection = _database.GetCollection<T>(collectionName);
 
             return collection.Find(Builders<T>.Filter.Empty).Skip((page - 1) * pageSize).Limit(pageSize).ToList();
+        }
+
+        public bool Exists<T>(string collectionName, string id) where T : class
+        {
+            var collection = _database.GetCollection<T>(collectionName);
+            var filter = Builders<T>.Filter.Eq("_id", id);
+
+            return collection.Find(filter).Any();
         }
     }
 
