@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 
-namespace Api.Features.Order.DeleteOrder
+namespace Orders.Api.Features.Order.DeleteOrder
 {
     internal sealed class Request
     {

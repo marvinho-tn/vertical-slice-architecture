@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace Api.Data
+namespace Orders.Api.Data
 {
     public class MongoDbContext
     {

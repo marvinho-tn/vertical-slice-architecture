@@ -1,7 +1,7 @@
-﻿using Api.Data;
+﻿using Orders.Api.Data;
 using FastEndpoints;
 
-namespace Api.Features.Order.DeleteOrder
+namespace Orders.Api.Features.Order.DeleteOrder
 {
     internal sealed class Endpoint(MongoDbContext dbContext) : Endpoint<Request, EmptyResponse>
     {

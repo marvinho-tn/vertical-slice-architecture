@@ -1,4 +1,4 @@
-using Api.Data;
+using Orders.Api.Data;
 using FastEndpoints;
 
 var builder = WebApplication.CreateBuilder(args);

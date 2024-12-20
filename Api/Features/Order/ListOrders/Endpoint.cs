@@ -1,7 +1,7 @@
-﻿using Api.Data;
+﻿using Orders.Api.Data;
 using FastEndpoints;
 
-namespace Api.Features.Order.ListOrders
+namespace Orders.Api.Features.Order.ListOrders
 {
     internal sealed class Endpoint(MongoDbContext dbContext) : Endpoint<Request, IEnumerable<Response>, Mapper>
     {

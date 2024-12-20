@@ -1,4 +1,4 @@
-﻿namespace Api.Features.Order
+﻿namespace Orders.Api.Features.Order
 {
     internal static class Constants
     {

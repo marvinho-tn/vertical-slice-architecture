@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 
-namespace Api.Features.Order.CreateOrder
+namespace Orders.Api.Features.Order.CreateOrder
 {
     internal sealed class Request
     {

@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 
-namespace Api.Features.Order.CreateOrder
+namespace Orders.Api.Features.Order.CreateOrder
 {
     internal sealed class Mapper : Mapper<Request, Response, OrderEntity>
     {
