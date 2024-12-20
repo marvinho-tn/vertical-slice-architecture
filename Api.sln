@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orders.Api", "Orders.Api.csproj", "{4CF8D495-482E-4B5E-9160-491C42419616}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Api", "Order.Api\Order.Api.csproj", "{4CF8D495-482E-4B5E-9160-491C42419616}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YARP", "..\YARP\YARP.csproj", "{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YARP", "YARP\YARP.csproj", "{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Api", "..\Inventory.Api\Inventory.Api.csproj", "{7BB8431D-9986-48E3-8E71-74A002765853}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Api", "Inventory.Api\Inventory.Api.csproj", "{7BB8431D-9986-48E3-8E71-74A002765853}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{70E9B023-C223-4E6B-91FD-77B578FA74C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{70E9B023-C223-4E6B-91FD-77B578FA74C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

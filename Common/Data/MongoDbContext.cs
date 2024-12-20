@@ -59,6 +59,19 @@ namespace Common.Data
 
             return collection.Find(filter).Any();
         }
+
+        public List<T> Search<T>(string collectionName, Dictionary<string, string> fields, int page, int pageSize) where T : class
+        {
+            var collection = _database.GetCollection<T>(collectionName);
+            var filter = Builders<T>.Filter.Empty;
+
+            foreach (var field in fields)
+            {
+                filter = filter & Builders<T>.Filter.Eq(field.Key, field.Value);
+            }
+
+            return collection.Find(filter).Skip((page - 1) * pageSize).Limit(pageSize).ToList();
+        }
     }
 
     public class MongoDbSettings
