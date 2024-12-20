@@ -13,7 +13,7 @@ namespace Inventory.Api.Features.Product.SearchProduct
 
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
-            var products = dbContext.Search<ProductEntity>(Constants.ProductsCollectionName, req.Fields, req.Page, req.PageSize);
+            var products = dbContext.Search<ProductEntity>(Constants.ProductsCollectionName, req.FieldsAsDictionary, req.Page, req.PageSize);
             var response = products.Select(Map.FromEntity).ToList();
 
             await SendAsync(response);
