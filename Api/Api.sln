@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orders.Api", "Orders.Api.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YARP", "..\YARP\YARP.csproj", "{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Api", "..\Inventory.Api\Inventory.Api.csproj", "{7BB8431D-9986-48E3-8E71-74A002765853}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3528FB9-12D3-4C63-B25D-1F8615C91B0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BB8431D-9986-48E3-8E71-74A002765853}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BB8431D-9986-48E3-8E71-74A002765853}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BB8431D-9986-48E3-8E71-74A002765853}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BB8431D-9986-48E3-8E71-74A002765853}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
