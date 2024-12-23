@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using Common.Data;
+using static Inventory.Api.Features.Product.ProductEntity;
 
 namespace Inventory.Api.Features.Product.RegisterProduct
 {
@@ -16,6 +17,14 @@ namespace Inventory.Api.Features.Product.RegisterProduct
             var entity = Map.ToEntity(req);
 
             entity.Id = Guid.NewGuid().ToString();
+            entity.ProductStockHistory =
+            [
+                new ProductStockEntity
+                {
+                    Quantity = entity.QuantityInStock,
+                    Operation = ProductStockEntity.StockOperationType.Adjust,
+                }
+            ];
 
             dbContext.Add(Constants.ProductsCollectionName, entity);
 

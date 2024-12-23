@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using Common.Data;
+using static Inventory.Api.Features.Product.ProductEntity;
 
 namespace Inventory.Api.Features.Product.UpdateProduct
 {
@@ -13,13 +14,28 @@ namespace Inventory.Api.Features.Product.UpdateProduct
 
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
-            var exists = dbContext.Exists<ProductEntity>(Constants.ProductsCollectionName, req.Id);
+            var entity = dbContext.GetById<ProductEntity>(Constants.ProductsCollectionName, req.Id);
 
-            if (exists)
+            if (entity is not null)
             {
-                var entity = Map.ToEntity(req);
+                entity.Price = req.Price;
+                entity.Name = req.Name;
+                entity.Description = req.Description;
 
-                dbContext.Update(Constants.ProductsCollectionName, req.Id, entity);
+                if (entity.QuantityInStock != req.QuantityInStock)
+                {
+                    entity.QuantityInStock = req.QuantityInStock;
+                    entity.ProductStockHistory =
+                    [
+                        new ProductStockEntity
+                                    {
+                                        Quantity = entity.QuantityInStock,
+                                        Operation = ProductStockEntity.StockOperationType.Adjust,
+                                    }
+                    ];
+                }
+
+                dbContext.Update(Constants.ProductsCollectionName, entity.Id, entity);
 
                 var response = Map.FromEntity(entity);
 
