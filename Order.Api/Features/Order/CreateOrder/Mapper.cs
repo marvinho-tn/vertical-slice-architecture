@@ -8,14 +8,8 @@ namespace Orders.Api.Features.Order.CreateOrder
         {
             return new OrderEntity
             {
-                Client = new OrderClientEntity
-                {
-                    Name = r.Client
-                },
-                Items = r.Items.Select(x => new OrderItemEntity
-                {
-                    Id = x
-                }).ToArray()
+                Client = r.Client,
+                Items = r.Items
             };
         }
 
@@ -24,8 +18,8 @@ namespace Orders.Api.Features.Order.CreateOrder
             return new Response
             {
                 Id = e.Id,
-                Client = e.Client.Name,
-                Items = e.Items.Select(x => x.Id).ToArray()
+                Client = e.Client,
+                Items = e.Items
             };
         }
     }

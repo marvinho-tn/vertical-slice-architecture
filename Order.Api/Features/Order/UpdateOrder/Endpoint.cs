@@ -17,11 +17,8 @@ namespace Orders.Api.Features.Order.UpdateOrder
 
             if (entity is not null)
             {
-                entity.Client.Name = req.Client;
-                entity.Items = req.Items.Select(x => new OrderItemEntity
-                {
-                    Id = x
-                }).ToArray();
+                entity.Client = req.Client;
+                entity.Items = req.Items;
                 entity.Updated = DateTime.UtcNow;
 
                 dbContext.Update(Constants.OrdersCollectionName, entity.Id, entity);

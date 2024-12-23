@@ -9,8 +9,8 @@ namespace Orders.Api.Features.Order.ListOrders
             return new Response
             {
                 Id = e.Id,
-                Client = e.Client.Name,
-                Items = e.Items.Select(x => x.Id).ToArray()
+                Client = e.Client,
+                Items = e.Items
             };
         }
     }

@@ -10,18 +10,8 @@ namespace Orders.Api.Features.Order
         public string Id { get; set; }
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
-        public OrderClientEntity Client { get; set; }
-        public OrderItemEntity[] Items { get; set; }
-    }
-
-    internal sealed record OrderItemEntity
-    {
-        public string Id { get; set; }
-    }
-
-    internal sealed record OrderClientEntity
-    {
-        public string Name { get; set; }
+        public string Client { get; set; }
+        public string[] Items { get; set; }
     }
 
     internal sealed record ProductEntity
