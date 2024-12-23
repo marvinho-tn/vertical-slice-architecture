@@ -1,7 +1,8 @@
-﻿using Common.Data;
+﻿using System.Text.Json;
+using Common.Data;
 using FastEndpoints;
 
-namespace Orders.Api.Features.Order.CreateOrder
+namespace Order.Api.Features.Order.CreateOrder
 {
     internal sealed class Endpoint(MongoDbContext dbContext) : Endpoint<Request, Response, Mapper>
     {
@@ -22,6 +23,14 @@ namespace Orders.Api.Features.Order.CreateOrder
 
             dbContext.Add(Constants.OrdersCollectionName, entity);
 
+            var @event = new OrderRegisteredEvent
+            {
+                OrderID = entity.Id,
+                Items = entity.Items
+            };
+
+            await PublishAsync(@event, Mode.WaitForAll, ct);
+            
             var response = Map.FromEntity(entity);
 
             await SendAsync(response, 201, ct);

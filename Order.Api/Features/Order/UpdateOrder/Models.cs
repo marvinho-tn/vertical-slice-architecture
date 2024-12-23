@@ -2,7 +2,7 @@
 using FastEndpoints;
 using FluentValidation;
 
-namespace Orders.Api.Features.Order.UpdateOrder
+namespace Order.Api.Features.Order.UpdateOrder
 {
     internal sealed class Request
     {

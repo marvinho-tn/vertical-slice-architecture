@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 
-namespace Orders.Api.Features.Order
+namespace Order.Api.Features.Order
 {
     internal sealed record OrderEntity
     {
