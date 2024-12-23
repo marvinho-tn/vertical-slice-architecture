@@ -19,7 +19,8 @@ namespace Orders.Api.Features.Order.CreateOrder
             {
                 Id = e.Id,
                 Client = e.Client,
-                Items = e.Items
+                Items = e.Items,
+                Status = (int) e.Status
             };
         }
     }

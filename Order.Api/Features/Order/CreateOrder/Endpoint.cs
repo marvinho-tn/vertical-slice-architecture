@@ -18,6 +18,7 @@ namespace Orders.Api.Features.Order.CreateOrder
             entity.Id = Guid.NewGuid().ToString();
             entity.Created = DateTime.UtcNow;
             entity.Updated = DateTime.UtcNow;
+            entity.Status = OrderEntity.OrderStatus.Registered;
 
             dbContext.Add(Constants.OrdersCollectionName, entity);
 

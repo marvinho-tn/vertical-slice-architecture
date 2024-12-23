@@ -10,7 +10,8 @@ namespace Orders.Api.Features.Order.UpdateOrder
             {
                 Id = e.Id,
                 Client = e.Client,
-                Items = e.Items
+                Items = e.Items,
+                Status = (int) e.Status
             };
         }
     }

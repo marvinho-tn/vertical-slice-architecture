@@ -34,6 +34,7 @@ namespace Orders.Api.Features.Order.CreateOrder
     {
         public string Id { get; set; }
         public string Client { get; set; }
+        public int Status { get; set; }
         public string[] Items { get; set; }
     }
 }
