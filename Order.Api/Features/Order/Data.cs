@@ -16,11 +16,18 @@ namespace Orders.Api.Features.Order
 
     internal sealed record OrderItemEntity
     {
-        public string Name { get; set; }
+        public string Id { get; set; }
     }
 
     internal sealed record OrderClientEntity
     {
         public string Name { get; set; }
+    }
+
+    internal sealed record ProductEntity
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.String)]
+        public string Id { get; set; }
     }
 }

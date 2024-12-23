@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using Common.Data;
+using FastEndpoints;
 using FluentValidation;
 
 namespace Orders.Api.Features.Order.CreateOrder
@@ -11,7 +12,7 @@ namespace Orders.Api.Features.Order.CreateOrder
 
     internal sealed class Validator : Validator<Request>
     {
-        public Validator()
+        public Validator(MongoDbContext dbContext)
         {
             RuleFor(x => x.Client)
                 .NotNull()
@@ -23,7 +24,9 @@ namespace Orders.Api.Features.Order.CreateOrder
 
             RuleForEach(x => x.Items)
                 .NotEmpty()
-                .WithMessage("Nome do item do pedido é obrigatório");
+                .WithMessage("Nome do item do pedido é obrigatório")
+                .Must((request, item, cancellation) => dbContext.Exists<ProductEntity>(Constants.ProductsCollectionName, item))
+                .WithMessage("Item não existe no cadastro de produtos");
         }
     }
 

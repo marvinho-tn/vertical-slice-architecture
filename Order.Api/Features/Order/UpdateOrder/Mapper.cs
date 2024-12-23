@@ -10,7 +10,7 @@ namespace Orders.Api.Features.Order.UpdateOrder
             {
                 Id = e.Id,
                 Client = e.Client.Name,
-                Items = e.Items.Select(x => x.Name).ToArray()
+                Items = e.Items.Select(x => x.Id).ToArray()
             };
         }
     }

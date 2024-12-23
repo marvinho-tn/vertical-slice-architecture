@@ -15,18 +15,25 @@ namespace Orders.Api.Features.Order.UpdateOrder
         {
             var entity = dbContext.GetById<OrderEntity>(Constants.OrdersCollectionName, req.Id);
 
-            entity.Client.Name = req.Client;
-            entity.Items = req.Items.Select(x => new OrderItemEntity
+            if (entity is not null)
             {
-                Name = x
-            }).ToArray();
-            entity.Updated = DateTime.UtcNow;
+                entity.Client.Name = req.Client;
+                entity.Items = req.Items.Select(x => new OrderItemEntity
+                {
+                    Id = x
+                }).ToArray();
+                entity.Updated = DateTime.UtcNow;
 
-            dbContext.Update(Constants.OrdersCollectionName, entity.Id, entity);
+                dbContext.Update(Constants.OrdersCollectionName, entity.Id, entity);
 
-            var response = Map.FromEntity(entity);
+                var response = Map.FromEntity(entity);
 
-            await SendAsync(response, 200);
+                await SendAsync(response);
+            }
+            else
+            {
+                await SendNotFoundAsync();
+            }
         }
     }
 }

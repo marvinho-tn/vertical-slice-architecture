@@ -14,7 +14,7 @@ namespace Orders.Api.Features.Order.CreateOrder
                 },
                 Items = r.Items.Select(x => new OrderItemEntity
                 {
-                    Name = x
+                    Id = x
                 }).ToArray()
             };
         }
@@ -25,7 +25,7 @@ namespace Orders.Api.Features.Order.CreateOrder
             {
                 Id = e.Id,
                 Client = e.Client.Name,
-                Items = e.Items.Select(x => x.Name).ToArray()
+                Items = e.Items.Select(x => x.Id).ToArray()
             };
         }
     }
