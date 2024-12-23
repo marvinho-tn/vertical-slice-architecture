@@ -13,7 +13,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
 
     internal sealed class Validator : Validator<Request>
     {
-        public Validator(MongoDbContext dbContext)
+        public Validator(IDbContext dbContext)
         {
             RuleFor(x => x.Id)
                 .NotEmpty()
@@ -30,7 +30,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
                 {
                     if (request.OperationType == ProductEntity.ProductStockEntity.StockOperationType.Decrease)
                     {
-                        var product = dbContext.GetById<ProductEntity>(Constants.ProductsCollectionName, request.Id);
+                        var product = dbContext.GetById<ProductEntity>(request.Id);
 
                         return product is not null && product.QuantityInStock >= request.Quantity;
                     }

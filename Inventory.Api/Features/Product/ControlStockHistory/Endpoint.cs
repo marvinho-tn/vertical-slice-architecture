@@ -3,7 +3,7 @@ using FastEndpoints;
 
 namespace Inventory.Api.Features.Product.ControlStockHistory
 {
-    internal sealed class Endpoint(MongoDbContext dbContext) : Endpoint<Request, Response, Mapper>
+    internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
     {
         public override void Configure()
         {
@@ -13,7 +13,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
 
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
-            var product = dbContext.GetById<ProductEntity>(Constants.ProductsCollectionName, req.Id);
+            var product = dbContext.GetById<ProductEntity>(req.Id);
 
             if (product is not null)
             {
@@ -38,7 +38,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
 
                 product.ProductStockHistory.Add(stockHistory);
 
-                dbContext.Update(Constants.ProductsCollectionName, product.Id, product);
+                dbContext.Update(product.Id, product);
 
                 var response = Map.FromEntity(product);
 

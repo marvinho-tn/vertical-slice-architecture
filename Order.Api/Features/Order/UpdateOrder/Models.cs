@@ -13,7 +13,7 @@ namespace Order.Api.Features.Order.UpdateOrder
 
     internal sealed class Validator : Validator<Request>
     {
-        public Validator(MongoDbContext dbContext)
+        public Validator(IDbContext dbContext)
         {
             RuleFor(x => x.Id)
                 .NotNull()
@@ -30,7 +30,7 @@ namespace Order.Api.Features.Order.UpdateOrder
             RuleForEach(x => x.Items)
                 .NotEmpty()
                 .WithMessage("Nome do item do pedido é obrigatório")
-                .Must((request, item, cancellation) => dbContext.Exists<ProductEntity>(Constants.ProductsCollectionName, item))
+                .Must((request, item, cancellation) => dbContext.Exists<ProductEntity>(item))
                 .WithMessage("Item não existe no cadastro de produtos");
         }
     }

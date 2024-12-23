@@ -4,7 +4,7 @@ using static Inventory.Api.Features.Product.ProductEntity;
 
 namespace Inventory.Api.Features.Product.UpdateProduct
 {
-    internal sealed class Endpoint(MongoDbContext dbContext) : Endpoint<Request, Response, Mapper>
+    internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
     {
         public override void Configure()
         {
@@ -14,7 +14,7 @@ namespace Inventory.Api.Features.Product.UpdateProduct
 
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
-            var entity = dbContext.GetById<ProductEntity>(Constants.ProductsCollectionName, req.Id);
+            var entity = dbContext.GetById<ProductEntity>(req.Id);
 
             if (entity is not null)
             {
@@ -35,7 +35,7 @@ namespace Inventory.Api.Features.Product.UpdateProduct
                     ];
                 }
 
-                dbContext.Update(Constants.ProductsCollectionName, entity.Id, entity);
+                dbContext.Update(entity.Id, entity);
 
                 var response = Map.FromEntity(entity);
 

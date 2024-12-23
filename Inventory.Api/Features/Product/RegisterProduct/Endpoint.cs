@@ -4,7 +4,7 @@ using static Inventory.Api.Features.Product.ProductEntity;
 
 namespace Inventory.Api.Features.Product.RegisterProduct
 {
-    internal sealed class Endpoint(MongoDbContext dbContext) : Endpoint<Request, Response, Mapper>
+    internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
     {
         public override void Configure()
         {
@@ -26,7 +26,7 @@ namespace Inventory.Api.Features.Product.RegisterProduct
                 }
             ];
 
-            dbContext.Add(Constants.ProductsCollectionName, entity);
+            dbContext.Add(entity);
 
             var response = Map.FromEntity(entity);
 

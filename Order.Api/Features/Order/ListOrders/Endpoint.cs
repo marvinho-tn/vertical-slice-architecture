@@ -3,7 +3,7 @@ using FastEndpoints;
 
 namespace Order.Api.Features.Order.ListOrders
 {
-    internal sealed class Endpoint(MongoDbContext dbContext) : Endpoint<Request, IEnumerable<Response>, Mapper>
+    internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, IEnumerable<Response>, Mapper>
     {
         public override void Configure()
         {
@@ -13,7 +13,7 @@ namespace Order.Api.Features.Order.ListOrders
 
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
-            var orders = dbContext.GetAll<OrderEntity>(Constants.OrdersCollectionName, req.Page, req.PageSize);
+            var orders = dbContext.GetAll<OrderEntity>(req.Page, req.PageSize);
             var response = orders.Select(Map.FromEntity);
 
             await SendAsync(response, 200, ct);

@@ -4,7 +4,7 @@ using FastEndpoints;
 
 namespace Order.Api.Features.Order.CreateOrder
 {
-    internal sealed class Endpoint(MongoDbContext dbContext) : Endpoint<Request, Response, Mapper>
+    internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
     {
         public override void Configure()
         {
@@ -21,7 +21,7 @@ namespace Order.Api.Features.Order.CreateOrder
             entity.Updated = DateTime.UtcNow;
             entity.Status = OrderEntity.OrderStatus.Registered;
 
-            dbContext.Add(Constants.OrdersCollectionName, entity);
+            dbContext.Add(entity);
 
             var @event = new OrderRegisteredEvent
             {
