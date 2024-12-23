@@ -11,12 +11,12 @@ namespace Orders.Api.Features.Order.ListOrders
             AllowAnonymous();
         }
 
-        public override async Task HandleAsync(Request request, CancellationToken cancellationToken)
+        public override async Task HandleAsync(Request req, CancellationToken ct)
         {
-            var orders = dbContext.GetAll<OrderEntity>(Constants.OrdersCollectionName, request.Page, request.PageSize);
+            var orders = dbContext.GetAll<OrderEntity>(Constants.OrdersCollectionName, req.Page, req.PageSize);
             var response = orders.Select(Map.FromEntity);
 
-            await SendAsync(response);
+            await SendAsync(response, 200, ct);
         }
     }
 }

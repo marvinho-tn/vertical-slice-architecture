@@ -15,7 +15,7 @@ namespace Orders.Api.Features.Order.DeleteOrder
         {
             dbContext.Delete<OrderEntity>(Constants.OrdersCollectionName, req.Id);
 
-            await SendNoContentAsync();
+            await SendNoContentAsync(ct);
         }
     }
 }

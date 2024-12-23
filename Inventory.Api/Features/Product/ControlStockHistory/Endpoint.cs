@@ -42,11 +42,11 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
 
                 var response = Map.FromEntity(product);
 
-                await SendAsync(response);
+                await SendAsync(response, 200, ct);
             }
             else
             {
-                await SendNotFoundAsync();
+                await SendNotFoundAsync(ct);
             }
         }
     }

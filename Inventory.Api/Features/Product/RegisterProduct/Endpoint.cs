@@ -30,7 +30,7 @@ namespace Inventory.Api.Features.Product.RegisterProduct
 
             var response = Map.FromEntity(entity);
 
-            await SendAsync(response, 201);
+            await SendAsync(response, 201, ct);
         }
     }
 }

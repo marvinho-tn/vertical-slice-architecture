@@ -39,11 +39,11 @@ namespace Inventory.Api.Features.Product.UpdateProduct
 
                 var response = Map.FromEntity(entity);
 
-                await SendAsync(response);
+                await SendAsync(response, 200, ct);
             }
             else
             {
-                await SendNotFoundAsync();
+                await SendNotFoundAsync(ct);
             }
         }
     }

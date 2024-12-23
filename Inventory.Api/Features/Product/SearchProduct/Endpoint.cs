@@ -16,7 +16,7 @@ namespace Inventory.Api.Features.Product.SearchProduct
             var products = dbContext.Search<ProductEntity>(Constants.ProductsCollectionName, req.FieldsAsDictionary, req.Page, req.PageSize);
             var response = products.Select(Map.FromEntity).ToList();
 
-            await SendAsync(response);
+            await SendAsync(response, 200, ct);
         }
     }
 }

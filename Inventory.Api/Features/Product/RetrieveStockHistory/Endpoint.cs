@@ -19,11 +19,11 @@ namespace Inventory.Api.Features.Product.RetrieveStockHistory
             {
                 var response = product.ProductStockHistory.Select(Map.FromEntity).ToArray();
 
-                await SendAsync(response);
+                await SendAsync(response, 200, ct);
             }
             else
             {
-                await SendNotFoundAsync();
+                await SendNotFoundAsync(ct);
             }
         }
     }
