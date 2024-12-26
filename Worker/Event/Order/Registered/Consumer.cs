@@ -1,15 +1,16 @@
+using Common.Serialization;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 using RestSharp;
 
-namespace Worker.Event.OrderRegistered;
+namespace Worker.Event.Order.Registered;
 
-internal sealed class OrderRegisteredConsumer
+internal sealed class Consumer
 (
     IOptions<ApisConfig> apisConfig,
     IProducer<string, ProductOutOfStockEvent> productOutOfStockProducer,
     IProducer<string, OrderSeparatedEvent> orderSeparatedProducer,
-    IConsumer<string, OrderRegisteredEvent> consumer
+    IConsumer<string, Message> consumer
 )
     : IHostedService
 {
@@ -32,7 +33,7 @@ internal sealed class OrderRegisteredConsumer
                 {
                     var request = new RestRequest($"/products/{item}/stock-history", Method.Put);
 
-                    request.AddJsonBody(new UpdateProductStockRequest
+                    request.AddJsonBody(new Request
                     {
                         OperationType = 2,
                         Quantity = 1
@@ -83,5 +84,31 @@ internal sealed class OrderRegisteredConsumer
         consumer.Dispose();
         
         return Task.CompletedTask;
+    }
+}
+
+internal static class Configuration
+{
+    public static void AddOrderRegisteredEvent(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddTransient<IProducer<string, ProductOutOfStockEvent>>(sp =>
+            new ProducerBuilder<string, ProductOutOfStockEvent>(
+                    configuration.GetSection("Kafka:ProducerConfig").Get<ProducerConfig>())
+                .SetValueSerializer(new CustomJsonSerializer<ProductOutOfStockEvent>())
+                .Build());
+
+        services.AddTransient<IProducer<string, OrderSeparatedEvent>>(sp =>
+            new ProducerBuilder<string, OrderSeparatedEvent>(
+                    configuration.GetSection("Kafka:ProducerConfig").Get<ProducerConfig>())
+                .SetValueSerializer(new CustomJsonSerializer<OrderSeparatedEvent>())
+                .Build());
+
+        services.AddTransient<IConsumer<string, Message>>(sp =>
+            new ConsumerBuilder<string, Message>(
+                    configuration.GetSection("Kafka:ConsumerConfig").Get<ConsumerConfig>())
+                .SetValueDeserializer(new CustomJsonSerializer<Message>())
+                .Build());
+
+        services.AddHostedService<Consumer>();
     }
 }

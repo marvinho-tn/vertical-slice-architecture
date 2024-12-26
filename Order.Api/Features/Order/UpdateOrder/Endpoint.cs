@@ -20,6 +20,7 @@ namespace Order.Api.Features.Order.UpdateOrder
                 entity.Client = req.Client;
                 entity.Items = req.Items;
                 entity.Updated = DateTime.UtcNow;
+                entity.Status = (OrderEntity.OrderStatus) req.Status;
 
                 dbContext.Update(entity.Id, entity);
 

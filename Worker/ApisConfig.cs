@@ -8,4 +8,5 @@ public class ApiConfig
 public class ApisConfig
 {
     public ApiConfig InventoryApi { get; set; }
+    public ApiConfig OrderApi { get; set; }
 }
