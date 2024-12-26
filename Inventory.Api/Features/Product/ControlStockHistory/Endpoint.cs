@@ -17,7 +17,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
 
             if (product is not null)
             {
-                switch (req.OperationType)
+                switch ((ProductEntity.ProductStockEntity.StockOperationType) req.OperationType)
                 {
                     case ProductEntity.ProductStockEntity.StockOperationType.Increase:
                         product.QuantityInStock += req.Quantity;
@@ -33,7 +33,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
                 var stockHistory = new ProductEntity.ProductStockEntity
                 {
                     Quantity = req.Quantity,
-                    Operation = req.OperationType
+                    Operation = (ProductEntity.ProductStockEntity.StockOperationType) req.OperationType
                 };
 
                 product.ProductStockHistory.Add(stockHistory);

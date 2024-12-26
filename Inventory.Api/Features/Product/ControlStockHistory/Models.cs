@@ -7,7 +7,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
     internal sealed class Request
     {
         public string Id { get; set; }
-        public ProductEntity.ProductStockEntity.StockOperationType OperationType { get; set; }
+        public int OperationType { get; set; }
         public int Quantity { get; set; }
     }
 
@@ -28,7 +28,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
                 .WithMessage("Tipo de operação inválido")
                 .Must((request, cancellation) =>
                 {
-                    if (request.OperationType == ProductEntity.ProductStockEntity.StockOperationType.Decrease)
+                    if (request.OperationType == (int) ProductEntity.ProductStockEntity.StockOperationType.Decrease)
                     {
                         var product = dbContext.GetById<ProductEntity>(request.Id);
 
