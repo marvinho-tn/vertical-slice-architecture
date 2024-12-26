@@ -1,9 +1,8 @@
-using Common.Data;
 using Common.Serialization;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
-namespace Inventory.Api.Features.Product.ControlStockHistory;
+namespace Worker.Consumers;
 
 internal sealed class OrderRegisteredMessage
 {
@@ -24,7 +23,6 @@ internal sealed class OrderSeparatedEvent
 
 internal sealed class OrderRegisteredConsumer : IHostedService
 {
-    private readonly IDbContext _dbContext;
     private readonly IProducer<string, ProductOutOfStockEvent> _productOutOfStockProducer;
     private readonly IProducer<string, OrderSeparatedEvent> _orderSeparatedProducer;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -33,12 +31,10 @@ internal sealed class OrderRegisteredConsumer : IHostedService
     public OrderRegisteredConsumer
     (
         IOptions<ConsumerConfig> config,
-        IDbContext dbContext, 
         IProducer<string, ProductOutOfStockEvent> productOutOfStockProducer,
         IProducer<string, OrderSeparatedEvent> orderSeparatedProducer
     )
     {
-        _dbContext = dbContext;
         _productOutOfStockProducer = productOutOfStockProducer;
         _orderSeparatedProducer = orderSeparatedProducer;
         _consumer = new ConsumerBuilder<string, OrderRegisteredMessage>(config.Value)
@@ -60,34 +56,7 @@ internal sealed class OrderRegisteredConsumer : IHostedService
                 
                 foreach (var item in consumeResult.Message.Value.Items)
                 {
-                    var product = _dbContext.GetById<ProductEntity>(item);
-
-                    if (product is null || product.QuantityInStock == 0)
-                    {
-                        await _productOutOfStockProducer.ProduceAsync(Constants.ProductOutOfStockTopic,
-                            new Message<string, ProductOutOfStockEvent>
-                            {
-                                Key = Guid.NewGuid().ToString(),
-                                Value = new ProductOutOfStockEvent
-                                {
-                                    SourceOrderID = consumeResult.Message.Value.OrderID,
-                                    ProductID = item
-                                }
-                            }, _cancellationTokenSource.Token);
-                    }
-                    else
-                    {
-                        product.QuantityInStock--;
-                        product.ProductStockHistory.Add(new ProductEntity.ProductStockEntity
-                        {
-                            Operation = ProductEntity.ProductStockEntity.StockOperationType.Decrease,
-                            Quantity = 1
-                        });
-
-                        _dbContext.Update(product.Id, product);
-
-                        separatedItems++;
-                    }
+                    // envia para api de inventário
                 }
 
                 if (separatedItems == consumeResult.Value.Items.Length)
