@@ -19,7 +19,6 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
 
             if (consumeResult.Message is not null)
             {
-                var separatedProducts = 0;
                 var restClient = new RestClient(apisConfig.Value.InventoryApi.BaseUrl);
 
                 foreach (var item in consumeResult.Message.Value.Items)
@@ -36,17 +35,12 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
 
                     if (response.IsSuccessStatusCode)
                     {
-                        separatedProducts++;
+                        await UpdateOrderStatusAsync(consumeResult, 2, item);
                     }
                     else
                     {
-                        await UpdateOrderStatusAsync(consumeResult, 3);
+                        await UpdateOrderStatusAsync(consumeResult, 3, item);
                     }
-                }
-
-                if (separatedProducts == consumeResult.Message.Value.Items.Length)
-                {
-                    await UpdateOrderStatusAsync(consumeResult, 2);
                 }
 
                 consumer.Commit(consumeResult);
@@ -54,7 +48,7 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
         }
     }
 
-    private async Task UpdateOrderStatusAsync(ConsumeResult<string, Message> consumeResult, int orderStatus)
+    private async Task UpdateOrderStatusAsync(ConsumeResult<string, Message> consumeResult, int orderStatus, string itemId)
     {
         var restClient = new RestClient(apisConfig.Value.OrderApi.BaseUrl);
         var request = new RestRequest($"/orders/{consumeResult.Message.Value.OrderID}/status", Method.Put);
@@ -62,15 +56,11 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
         request.AddJsonBody(new
         {
             Id = consumeResult.Message.Value.OrderID,
+            ItemId = itemId,
             Status = orderStatus,
         });
 
-        var response = await restClient.ExecuteAsync(request, _cancellationTokenSource.Token);
-
-        if (response.IsSuccessStatusCode)
-        {
-            consumer.Commit(consumeResult);
-        }
+        await restClient.ExecuteAsync(request, _cancellationTokenSource.Token);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

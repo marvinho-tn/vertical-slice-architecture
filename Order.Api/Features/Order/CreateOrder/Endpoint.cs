@@ -19,14 +19,13 @@ namespace Order.Api.Features.Order.CreateOrder
             entity.Id = Guid.NewGuid().ToString();
             entity.Created = DateTime.UtcNow;
             entity.Updated = DateTime.UtcNow;
-            entity.Status = OrderEntity.OrderStatus.Registered;
 
             dbContext.Add(entity);
 
             var @event = new OrderRegisteredEvent
             {
                 OrderID = entity.Id,
-                Items = entity.Items
+                Items = entity.Items.Select(c => c.Id).ToArray()
             };
 
             await PublishAsync(@event, Mode.WaitForAll, ct);

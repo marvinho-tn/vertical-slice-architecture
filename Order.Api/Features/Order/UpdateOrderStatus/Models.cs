@@ -7,20 +7,25 @@ namespace Order.Api.Features.Order.UpdateOrderStatus
     internal sealed class Request
     {
         public string Id { get; set; }
+        public string ItemId { get; set; }
         public int Status { get; set; }
     }
-
+    
     internal sealed class Validator : Validator<Request>
     {
-        public Validator(IDbContext dbContext)
+        public Validator()
         {
             RuleFor(x => x.Id)
                 .NotNull()
                 .WithMessage("Id do pedido é obrigatório");
 
+            RuleFor(x => x.ItemId)
+                .NotNull()
+                .WithMessage("Id do item é obrigatório");
+            
             RuleFor(x => x.Status)
                 .NotNull()
-                .WithMessage("Status do pedido é obrigatório");
+                .WithMessage("Status do item é obrigatório");
         }
     }
 

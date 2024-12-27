@@ -1,8 +1,8 @@
 ﻿using Common.Data;
 using FastEndpoints;
-using Order.Api.Features.Order.UpdateOrderStatus;
+using Order.Api.Features.Order.UpdateOrder;
 
-namespace Order.Api.Features.Order.UpdateOrder
+namespace Order.Api.Features.Order.UpdateOrderStatus
 {
     internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
     {
@@ -19,7 +19,12 @@ namespace Order.Api.Features.Order.UpdateOrder
             if (entity is not null)
             {
                 entity.Updated = DateTime.UtcNow;
-                entity.Status = (OrderEntity.OrderStatus) req.Status;
+
+                foreach (var item in entity.Items)
+                {
+                    if (item.Id == req.ItemId)
+                        item.Status = (OrderEntity.OrderStatus)req.Status;
+                }
 
                 dbContext.Update(entity.Id, entity);
 

@@ -11,9 +11,14 @@ namespace Order.Api.Features.Order
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
         public string Client { get; set; }
-        public string[] Items { get; set; }
-        public OrderStatus Status { get; set; }
+        public Item[] Items { get; set; }
 
+        internal sealed class Item
+        {
+            public string Id { get; set; }
+            public OrderStatus Status { get; set; }
+        }
+        
         internal enum OrderStatus
         {
             Registered = 1,
