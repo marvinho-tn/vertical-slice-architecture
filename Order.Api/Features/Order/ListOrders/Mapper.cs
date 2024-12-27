@@ -25,13 +25,15 @@ namespace Order.Api.Features.Order.ListOrders
             
             if(oneIsOutOfStock)
                 status = OrderEntity.OrderStatus.OutOfStock;
-
+            
+            var isInPreparation = !allAreRegistered && !allAreSeparated && !oneIsOutOfStock;
+            
             return new Response
             {
                 Id = e.Id,
                 Client = e.Client,
                 Items = e.Items.Select(c => c.Id).ToArray(),
-                Status = (int) status
+                Status = isInPreparation ? 4 : (int) status
             };
         }
     }
