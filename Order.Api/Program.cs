@@ -14,12 +14,7 @@ builder.Services.AddMongoDbContext(new Dictionary<Type, string>
     { typeof(ProductEntity), Constants.ProductsCollectionName }
 });
 
-builder.Services.AddTransient<IProducer<string, OrderRegisteredEvent>>(sp =>
-    new ProducerBuilder<string, OrderRegisteredEvent>(
-            builder.Configuration.GetSection("Kafka").Get<ProducerConfig>())
-        .SetValueSerializer(new CustomJsonSerializer<OrderRegisteredEvent>())
-        .Build());
-
+builder.Services.AddOrderRegisteredEvent(builder.Configuration);
 builder.Services.AddFastEndpoints();
 
 var app = builder.Build();

@@ -22,7 +22,7 @@ namespace Order.Api.Features.Order.CreateOrder
 
             dbContext.Add(entity);
 
-            var @event = new OrderRegisteredEvent
+            var @event = new Event
             {
                 OrderID = entity.Id,
                 Items = entity.Items.Select(c => c.Id).ToArray()

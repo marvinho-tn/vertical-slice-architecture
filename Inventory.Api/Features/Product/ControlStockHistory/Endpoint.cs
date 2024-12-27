@@ -40,6 +40,13 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
                 product.ProductStockHistory.Add(stockHistory);
 
                 dbContext.Update(product.Id, product);
+                
+                var @event = new Event
+                {
+                    ProductId = product.Id,
+                };
+
+                await PublishAsync(@event, Mode.WaitForAll, ct);
 
                 var response = Map.FromEntity(product);
 
