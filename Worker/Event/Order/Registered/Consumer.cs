@@ -19,9 +19,10 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
 
             if (consumeResult.Message is not null)
             {
+                var message = consumeResult.Message.Value;
                 var restClient = new RestClient(apisConfig.Value.InventoryApi.BaseUrl);
 
-                foreach (var item in consumeResult.Message.Value.Items)
+                foreach (var item in message.Items)
                 {
                     var request = new RestRequest($"/products/{item}/stock-history", Method.Put);
 
@@ -35,11 +36,11 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
 
                     if (response.IsSuccessStatusCode)
                     {
-                        await UpdateOrderStatusAsync(consumeResult, 2, item);
+                        await UpdateOrderStatusAsync(message.OrderID, 2, item);
                     }
                     else
                     {
-                        await UpdateOrderStatusAsync(consumeResult, 3, item);
+                        await UpdateOrderStatusAsync(message.OrderID, 3, item);
                     }
                 }
 
@@ -48,27 +49,27 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
         }
     }
 
-    private async Task UpdateOrderStatusAsync(ConsumeResult<string, Message> consumeResult, int orderStatus, string itemId)
-    {
-        var restClient = new RestClient(apisConfig.Value.OrderApi.BaseUrl);
-        var request = new RestRequest($"/orders/{consumeResult.Message.Value.OrderID}/status", Method.Put);
-
-        request.AddJsonBody(new
-        {
-            Id = consumeResult.Message.Value.OrderID,
-            ItemId = itemId,
-            Status = orderStatus,
-        });
-
-        await restClient.ExecuteAsync(request, _cancellationTokenSource.Token);
-    }
-
     public Task StopAsync(CancellationToken cancellationToken)
     {
         consumer.Close();
         consumer.Dispose();
 
         return Task.CompletedTask;
+    }
+
+    private async Task UpdateOrderStatusAsync(string orderId, int orderStatus, string itemId)
+    {
+        var restClient = new RestClient(apisConfig.Value.OrderApi.BaseUrl);
+        var request = new RestRequest($"/orders/{orderId}/status", Method.Put);
+
+        request.AddJsonBody(new
+        {
+            Id = orderId,
+            ItemId = itemId,
+            Status = orderStatus,
+        });
+
+        await restClient.ExecuteAsync(request, _cancellationTokenSource.Token);
     }
 }
 

@@ -44,6 +44,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
                 var @event = new Event
                 {
                     ProductId = product.Id,
+                    OperationType = req.OperationType
                 };
 
                 await PublishAsync(@event, Mode.WaitForAll, ct);

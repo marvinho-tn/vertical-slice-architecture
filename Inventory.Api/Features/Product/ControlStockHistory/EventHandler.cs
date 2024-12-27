@@ -7,6 +7,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory;
 internal sealed class Event
 {
     public string ProductId { get; set; }
+    public int OperationType { get; set; }
 }
 
 internal sealed class EventHandler(IProducer<string, Event> producer) : IEventHandler<Event>

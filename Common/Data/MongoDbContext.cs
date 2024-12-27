@@ -13,6 +13,7 @@ public interface IDbContext
     List<T> GetAll<T>(int page, int pageSize) where T : class;
     bool Exists<T>(string id) where T : class;
     List<T> Search<T>(Dictionary<string, string> fields, int page, int pageSize) where T : class;
+    IQueryable<T> AsQueryable<T>() where T : class;
 }
 
 public class MongoDbContext : IDbContext
@@ -93,6 +94,14 @@ public class MongoDbContext : IDbContext
         }
 
         return collection.Find(filter).Skip((page - 1) * pageSize).Limit(pageSize).ToList();
+    }
+
+    public IQueryable<T> AsQueryable<T>() where T : class
+    {
+        var collectionName = _collectionNames[typeof(T)];
+        var collection = _database.GetCollection<T>(collectionName);
+
+        return collection.AsQueryable();
     }
 }
 
