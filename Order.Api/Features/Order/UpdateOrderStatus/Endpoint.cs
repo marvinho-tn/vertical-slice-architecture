@@ -1,5 +1,6 @@
 ﻿using Common.Data;
 using FastEndpoints;
+using Order.Api.Features.Order.UpdateOrderStatus;
 
 namespace Order.Api.Features.Order.UpdateOrder
 {
@@ -7,7 +8,7 @@ namespace Order.Api.Features.Order.UpdateOrder
     {
         public override void Configure()
         {
-            Put("/orders/{Id}");
+            Put("/orders/{Id}/status");
             AllowAnonymous();
         }
 
@@ -17,8 +18,6 @@ namespace Order.Api.Features.Order.UpdateOrder
 
             if (entity is not null)
             {
-                entity.Client = req.Client;
-                entity.Items = req.Items;
                 entity.Updated = DateTime.UtcNow;
                 entity.Status = (OrderEntity.OrderStatus) req.Status;
 

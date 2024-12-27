@@ -14,10 +14,11 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
             var product = dbContext.GetById<ProductEntity>(req.Id);
+            var operationType = (ProductEntity.ProductStockEntity.StockOperationType) req.OperationType;
 
             if (product is not null)
             {
-                switch ((ProductEntity.ProductStockEntity.StockOperationType) req.OperationType)
+                switch (operationType)
                 {
                     case ProductEntity.ProductStockEntity.StockOperationType.Increase:
                         product.QuantityInStock += req.Quantity;

@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using Order.Api.Features.Order.UpdateOrderStatus;
 
 namespace Order.Api.Features.Order.UpdateOrder
 {

@@ -23,7 +23,7 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
                 .GreaterThan(0)
                 .WithMessage("Quantidade deve ser maior que zero");
 
-            RuleFor(x => x.OperationType)
+            RuleFor(x => (ProductEntity.ProductStockEntity.StockOperationType) x.OperationType)
                 .IsInEnum()
                 .WithMessage("Tipo de operação inválido")
                 .Must((request, cancellation) =>

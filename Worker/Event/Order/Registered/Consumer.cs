@@ -5,14 +5,7 @@ using RestSharp;
 
 namespace Worker.Event.Order.Registered;
 
-internal sealed class Consumer
-(
-    IOptions<ApisConfig> apisConfig,
-    IProducer<string, ProductOutOfStockEvent> productOutOfStockProducer,
-    IProducer<string, OrderSeparatedEvent> orderSeparatedProducer,
-    IConsumer<string, Message> consumer
-)
-    : IHostedService
+internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string, Message> consumer) : IHostedService
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
@@ -28,12 +21,12 @@ internal sealed class Consumer
             {
                 var separatedProducts = 0;
                 var restClient = new RestClient(apisConfig.Value.InventoryApi.BaseUrl);
-                
+
                 foreach (var item in consumeResult.Message.Value.Items)
                 {
                     var request = new RestRequest($"/products/{item}/stock-history", Method.Put);
 
-                    request.AddJsonBody(new Request
+                    request.AddJsonBody(new
                     {
                         OperationType = 2,
                         Quantity = 1
@@ -47,30 +40,13 @@ internal sealed class Consumer
                     }
                     else
                     {
-                        await productOutOfStockProducer.ProduceAsync(Constants.ProductOutOfStockTopic,
-                            new Message<string, ProductOutOfStockEvent>
-                            {
-                                Key = Guid.NewGuid().ToString(),
-                                Value = new ProductOutOfStockEvent
-                                {
-                                    SourceOrderID = consumeResult.Message.Value.OrderID,
-                                    ProductID = item
-                                }
-                            }, _cancellationTokenSource.Token);
+                        await UpdateOrderStatusAsync(consumeResult, 3);
                     }
                 }
 
                 if (separatedProducts == consumeResult.Message.Value.Items.Length)
                 {
-                    await orderSeparatedProducer.ProduceAsync(Constants.OrderSeparatedTopic,
-                        new Message<string, OrderSeparatedEvent>
-                        {
-                            Key = Guid.NewGuid().ToString(),
-                            Value = new OrderSeparatedEvent
-                            {
-                                OrderID = consumeResult.Message.Value.OrderID
-                            }
-                        }, _cancellationTokenSource.Token);
+                    await UpdateOrderStatusAsync(consumeResult, 2);
                 }
 
                 consumer.Commit(consumeResult);
@@ -78,31 +54,38 @@ internal sealed class Consumer
         }
     }
 
+    private async Task UpdateOrderStatusAsync(ConsumeResult<string, Message> consumeResult, int orderStatus)
+    {
+        var restClient = new RestClient(apisConfig.Value.OrderApi.BaseUrl);
+        var request = new RestRequest($"/orders/{consumeResult.Message.Value.OrderID}/status", Method.Put);
+
+        request.AddJsonBody(new
+        {
+            Id = consumeResult.Message.Value.OrderID,
+            Status = orderStatus,
+        });
+
+        var response = await restClient.ExecuteAsync(request, _cancellationTokenSource.Token);
+
+        if (response.IsSuccessStatusCode)
+        {
+            consumer.Commit(consumeResult);
+        }
+    }
+
     public Task StopAsync(CancellationToken cancellationToken)
     {
         consumer.Close();
         consumer.Dispose();
-        
+
         return Task.CompletedTask;
     }
 }
 
-internal static class Configuration
+internal static class DependencyConfiguration
 {
-    public static void AddOrderRegisteredEvent(this IServiceCollection services, IConfiguration configuration)
+    public static void AddOrderRegisteredConsumer(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddTransient<IProducer<string, ProductOutOfStockEvent>>(sp =>
-            new ProducerBuilder<string, ProductOutOfStockEvent>(
-                    configuration.GetSection("Kafka:ProducerConfig").Get<ProducerConfig>())
-                .SetValueSerializer(new CustomJsonSerializer<ProductOutOfStockEvent>())
-                .Build());
-
-        services.AddTransient<IProducer<string, OrderSeparatedEvent>>(sp =>
-            new ProducerBuilder<string, OrderSeparatedEvent>(
-                    configuration.GetSection("Kafka:ProducerConfig").Get<ProducerConfig>())
-                .SetValueSerializer(new CustomJsonSerializer<OrderSeparatedEvent>())
-                .Build());
-
         services.AddTransient<IConsumer<string, Message>>(sp =>
             new ConsumerBuilder<string, Message>(
                     configuration.GetSection("Kafka:ConsumerConfig").Get<ConsumerConfig>())
