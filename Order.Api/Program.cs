@@ -3,7 +3,7 @@ using Common.Serialization;
 using Confluent.Kafka;
 using FastEndpoints;
 using Order.Api.Features.Order;
-using Order.Api.Features.Order.CreateOrder;
+using Order.Api.Features.Order.Create;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,8 +1,7 @@
-﻿using System.Text.Json;
-using Common.Data;
+﻿using Common.Data;
 using FastEndpoints;
 
-namespace Order.Api.Features.Order.CreateOrder
+namespace Order.Api.Features.Order.Create
 {
     internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
     {

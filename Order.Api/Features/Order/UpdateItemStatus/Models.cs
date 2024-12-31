@@ -1,8 +1,7 @@
-﻿using Common.Data;
-using FastEndpoints;
+﻿using FastEndpoints;
 using FluentValidation;
 
-namespace Order.Api.Features.Order.UpdateOrderStatus
+namespace Order.Api.Features.Order.UpdateItemStatus
 {
     internal sealed class Request
     {

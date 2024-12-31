@@ -1,8 +1,7 @@
 ﻿using Common.Data;
 using FastEndpoints;
-using Order.Api.Features.Order.UpdateOrder;
 
-namespace Order.Api.Features.Order.UpdateOrderStatus
+namespace Order.Api.Features.Order.UpdateItemStatus
 {
     internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
     {
@@ -27,6 +26,13 @@ namespace Order.Api.Features.Order.UpdateOrderStatus
                 }
 
                 dbContext.Update(entity.Id, entity);
+
+                await PublishAsync(new Event
+                {
+                    OrderId = entity.Id,
+                    ItemId = req.ItemId,
+                    Status = req.Status
+                }, Mode.WaitForAll, ct);
 
                 var response = Map.FromEntity(entity);
 

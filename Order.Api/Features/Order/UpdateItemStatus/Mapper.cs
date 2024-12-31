@@ -1,20 +1,9 @@
 ﻿using FastEndpoints;
 
-namespace Order.Api.Features.Order.CreateOrder
+namespace Order.Api.Features.Order.UpdateItemStatus
 {
     internal sealed class Mapper : Mapper<Request, Response, OrderEntity>
     {
-        public override OrderEntity ToEntity(Request r)
-        {
-            return new OrderEntity
-            {
-                Client = r.Client,
-                Items = r.Items
-                    .Select(c => new OrderEntity.Item { Id = c, Status = OrderEntity.OrderStatus.Registered})
-                    .ToArray()
-            };
-        }
-
         public override Response FromEntity(OrderEntity e)
         {
             var status = default(OrderEntity.OrderStatus);
