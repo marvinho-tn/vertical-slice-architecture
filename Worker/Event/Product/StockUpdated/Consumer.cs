@@ -30,7 +30,7 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
 
                     if (orderResponse.IsSuccessStatusCode)
                     {
-                        var orders = JsonSerializer.Deserialize<Response[]>(orderResponse.Content);
+                        var orders = JsonSerializer.Deserialize<OrderResponse[]>(orderResponse.Content);
                         var inventoryRestClient = new RestClient(apisConfig.Value.InventoryApi.BaseUrl);
 
                         foreach (var order in orders)
