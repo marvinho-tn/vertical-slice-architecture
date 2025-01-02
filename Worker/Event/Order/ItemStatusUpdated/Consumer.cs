@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace Worker.Event.Order.ItemStatusUpdated;
 
-internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string, Registered.Message> consumer) : IHostedService
+internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string, Message> consumer) : IHostedService
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
@@ -18,7 +18,12 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
 
             if (consumeResult.Message is not null)
             {
-                // Send email to update stock
+                var message = consumeResult.Message.Value;
+
+                if (message.Status == 3)
+                {
+                    
+                }
                 
                 consumer.Commit(consumeResult);
             }
@@ -38,10 +43,10 @@ internal static class DependencyConfiguration
 {
     public static void AddOrderItemStatusUpdatedConsumer(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddTransient<IConsumer<string, Registered.Message>>(sp =>
-            new ConsumerBuilder<string, Registered.Message>(
+        services.AddTransient<IConsumer<string, Message>>(sp =>
+            new ConsumerBuilder<string, Message>(
                     configuration.GetSection("Kafka:ConsumerConfig").Get<ConsumerConfig>())
-                .SetValueDeserializer(new CustomJsonSerializer<Registered.Message>())
+                .SetValueDeserializer(new CustomJsonSerializer<Message>())
                 .Build());
 
         services.AddHostedService<Consumer>();

@@ -1,44 +1,31 @@
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace Notification.Api.Features;
 
 internal sealed class EmailConfig
 {
-    public string Server { get; set; }
-    public int Port { get; set; }
     public string Sender { get; set; }
     public string User { get; set; }
-    public string Password { get; set; }
 }
 
 internal interface IEmailService
 {
-    Task SendEmailAsync(string toEmail, string subject, string htmlContent);
+    Task SendEmailAsync(string toEmail, string subject, string content);
 }
 
-internal class EmailService(IOptions<EmailConfig> emailConfig) : IEmailService
+internal class EmailService(IOptions<EmailConfig> emailConfig, ISendGridClient client) : IEmailService
 {
-    public async Task SendEmailAsync(string toEmail, string subject, string htmlContent)
+    public async Task SendEmailAsync(string toEmail, string subject, string content)
     {
-        var email = new MimeMessage();
-        
-        email.From.Add(new MailboxAddress(emailConfig.Value.Sender, emailConfig.Value.User));
-        email.To.Add(new MailboxAddress("", toEmail));
-        email.Subject = subject;
+        var from = new EmailAddress(emailConfig.Value.Sender, emailConfig.Value.User);
+        var to = new EmailAddress(toEmail);
+        var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, content);
 
-        var bodyBuilder = new BodyBuilder { HtmlBody = htmlContent };
-        
-        email.Body = bodyBuilder.ToMessageBody();
-
-        using (var client = new SmtpClient())
-        {
-            await client.ConnectAsync(emailConfig.Value.Server, emailConfig.Value.Port, false);
-            await client.AuthenticateAsync(emailConfig.Value.User, emailConfig.Value.Password);
-            await client.SendAsync(email);
-            await client.DisconnectAsync(true);
-        }
+        await client.SendEmailAsync(msg);
     }
 }
 
@@ -47,6 +34,12 @@ internal static class EmailExtensions
     public static IServiceCollection AddEmailService(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<EmailConfig>(configuration.GetSection("Email"));
+        services.AddTransient<ISendGridClient>(sp =>
+        {
+            var apiKey = configuration.GetSection("SendGrid:ApiKey").Value;
+
+            return new SendGridClient(apiKey);
+        });
         services.AddTransient<IEmailService, EmailService>();
         
         return services;
