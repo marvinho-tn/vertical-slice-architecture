@@ -2,16 +2,20 @@ using Common.Serialization;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 using Refit;
+using Worker.Events.Order.ItemStatusUpdated;
 
-namespace Worker.Event.Order.Registered;
+namespace Worker.Features.Order.ItemStatusUpdated;
 
-internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string, Message> consumer) : IHostedService
+internal sealed class Consumer(
+    IOptions<ApisConfig> apisConfig,
+    IOptions<NotificationConfig> notificationConfig,
+    IConsumer<string, Message> consumer) : IHostedService
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        consumer.Subscribe(Constants.OrderRegisteredTopic);
+        consumer.Subscribe(Constants.OrderItemStatusUpdated);
 
         while (!_cancellationTokenSource.Token.IsCancellationRequested)
         {
@@ -20,30 +24,14 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
             if (consumeResult.Message is not null)
             {
                 var message = consumeResult.Message.Value;
-                var inventoryService = RestService.For<IInventoryApi>(apisConfig.Value.InventoryApi.BaseUrl);
-                var orderService = RestService.For<IOrderApi>(apisConfig.Value.OrderApi.BaseUrl);
 
-                foreach (var item in message.Items)
+                if (message.Status == 3)
                 {
-                    var request = new UpdateStockHistoryRequest
-                    {
-                        OperationType = 2,
-                        Quantity = 1
-                    };
+                    var service = RestService.For<INotificationApi>(apisConfig.Value.NotificationApi.BaseUrl);
                     
-                    var response = await inventoryService.UpdateStockHistoryAsync(item, request);
-                    
-                    var itemStatus = 2;
-
-                    if (response is null)
+                    await service.SendOutOfStockNotificationAsync(message.ItemId, new SendOutOfStockNotificationRequest
                     {
-                        itemStatus = 3;
-                    }
-                        
-                    await orderService.UpdateOrderStatusAsync(message.OrderID, new UpdateOrderStatusRequest
-                    {
-                        ItemId = item,
-                        Status = itemStatus
+                        To = notificationConfig.Value.StockManager
                     });
                 }
 
@@ -63,7 +51,7 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
 
 internal static class DependencyConfiguration
 {
-    public static void AddOrderRegisteredConsumer(this IServiceCollection services, IConfiguration configuration)
+    public static void AddOrderItemStatusUpdatedConsumer(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddTransient<IConsumer<string, Message>>(sp =>
             new ConsumerBuilder<string, Message>(

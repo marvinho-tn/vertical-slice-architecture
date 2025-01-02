@@ -1,7 +1,7 @@
 using Common.Data;
 using FastEndpoints;
 using Order.Api.Features.Order;
-using Order.Api.Features.Order.Create;
+using Order.Api.Features.Order.Register;
 using Order.Api.Features.Order.UpdateItemStatus;
 
 var builder = WebApplication.CreateBuilder(args);

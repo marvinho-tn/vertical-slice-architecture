@@ -1,4 +1,4 @@
-namespace Worker.Event.Order.Registered;
+namespace Worker.Events.Order.Registered;
 
 internal sealed class Message
 {

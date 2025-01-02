@@ -1,10 +1,10 @@
-using System.Text.Json;
 using Common.Serialization;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 using Refit;
+using Worker.Events.Product.StockUpdated;
 
-namespace Worker.Event.Product.StockUpdated;
+namespace Worker.Features.Product.StockUpdated;
 
 internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string, Message> consumer) : IHostedService
 {

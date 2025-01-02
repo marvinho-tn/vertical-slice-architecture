@@ -2,7 +2,7 @@ using Common.Serialization;
 using Confluent.Kafka;
 using FastEndpoints;
 
-namespace Order.Api.Features.Order.Create;
+namespace Order.Api.Features.Order.Register;
 
 internal sealed class Event
 {

@@ -1,4 +1,4 @@
-namespace Worker.Event.Order.ItemStatusUpdated;
+namespace Worker.Events.Order.ItemStatusUpdated;
 
 internal sealed class Message
 {

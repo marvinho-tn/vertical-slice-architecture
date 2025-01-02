@@ -1,7 +1,7 @@
 ﻿using Common.Data;
 using FastEndpoints;
 
-namespace Order.Api.Features.Order.Create
+namespace Order.Api.Features.Order.Register
 {
     internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
     {

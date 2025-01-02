@@ -1,4 +1,4 @@
-namespace Worker.Event.Product.StockUpdated;
+namespace Worker.Events.Product.StockUpdated;
 
 internal sealed class Message
 {

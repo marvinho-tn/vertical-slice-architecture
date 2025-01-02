@@ -1,7 +1,7 @@
 using Worker;
-using Worker.Event.Order.ItemStatusUpdated;
-using Worker.Event.Order.Registered;
-using Worker.Event.Product.StockUpdated;
+using Worker.Features.Order.ItemStatusUpdated;
+using Worker.Features.Order.Registered;
+using Worker.Features.Product.StockUpdated;
 
 var builder = WebApplication.CreateBuilder(args);
 
