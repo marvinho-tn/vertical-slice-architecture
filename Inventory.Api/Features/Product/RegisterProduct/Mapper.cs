@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using Common.Data;
+using FastEndpoints;
 
 namespace Inventory.Api.Features.Product.RegisterProduct
 {

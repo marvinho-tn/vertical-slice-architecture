@@ -1,7 +1,6 @@
 using Common.Data;
 using FastEndpoints;
 using Notification.Api.Features;
-using Notification.Api.Features.Product;
 
 var builder = WebApplication.CreateBuilder(args);
 

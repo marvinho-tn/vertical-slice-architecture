@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using Common.Data;
+using FastEndpoints;
 
 namespace Order.Api.Features.Order.Register
 {
@@ -10,7 +11,7 @@ namespace Order.Api.Features.Order.Register
             {
                 Client = r.Client,
                 Items = r.Items
-                    .Select(c => new OrderEntity.Item { Id = c, Status = OrderEntity.OrderStatus.Registered})
+                    .Select(c => new OrderEntity.OrderItem { Id = c, Status = OrderEntity.OrderStatus.Registered})
                     .ToArray()
             };
         }

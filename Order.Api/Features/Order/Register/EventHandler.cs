@@ -30,7 +30,7 @@ internal static class DependencyConfiguration
     {
         return services.AddTransient<IProducer<string, Event>>(sp =>
             new ProducerBuilder<string, Event>(
-                    configuration.GetSection("Kafka:ProducerConfig").Get<ProducerConfig>())
+                    configuration.GetSection("Kafka:Producer").Get<ProducerConfig>())
                 .SetValueSerializer(new CustomJsonSerializer<Event>())
                 .Build());
     }

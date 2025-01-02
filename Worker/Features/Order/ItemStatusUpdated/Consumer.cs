@@ -55,7 +55,7 @@ internal static class DependencyConfiguration
     {
         services.AddTransient<IConsumer<string, Message>>(sp =>
             new ConsumerBuilder<string, Message>(
-                    configuration.GetSection("Kafka:ConsumerConfig").Get<ConsumerConfig>())
+                    configuration.GetSection("Kafka:Consumer").Get<ConsumerConfig>())
                 .SetValueDeserializer(new CustomJsonSerializer<Message>())
                 .Build());
 
