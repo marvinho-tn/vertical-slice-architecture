@@ -5,7 +5,7 @@ using Inventory.Api.Features.Product.ControlStockHistory;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
+builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDb"));
 builder.Services.AddMongoDbContext(new Dictionary<Type, string>
 {
     { typeof(ProductEntity), Constants.ProductsCollectionName }

@@ -1,6 +1,4 @@
-using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
-using MimeKit;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 

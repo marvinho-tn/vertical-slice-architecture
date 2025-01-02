@@ -1,6 +1,5 @@
 ﻿using FastEndpoints;
 using Common.Data;
-using static Inventory.Api.Features.Product.ProductEntity;
 
 namespace Inventory.Api.Features.Product.RegisterProduct
 {
@@ -19,10 +18,10 @@ namespace Inventory.Api.Features.Product.RegisterProduct
             entity.Id = Guid.NewGuid().ToString();
             entity.ProductStockHistory =
             [
-                new ProductStockEntity
+                new ProductEntity.ProductStockEntity
                 {
                     Quantity = entity.QuantityInStock,
-                    Operation = ProductStockEntity.StockOperationType.Adjust,
+                    Operation = ProductEntity.ProductStockEntity.StockOperationType.Adjust,
                 }
             ];
 
