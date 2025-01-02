@@ -1,6 +1,6 @@
 using Refit;
 
-namespace Worker;
+namespace Worker.Http;
 
 public interface INotificationApi
 {

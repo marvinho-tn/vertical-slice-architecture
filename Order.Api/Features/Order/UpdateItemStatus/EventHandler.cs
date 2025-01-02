@@ -11,10 +11,12 @@ internal sealed class Event
     public int Status { get; set; }
 }
 
-internal sealed class EventHandler(IProducer<string, Event> producer) : IEventHandler<Event>
+internal sealed class EventHandler(IProducer<string, Event> producer, ILogger<EventHandler> logger) : IEventHandler<Event>
 {
     public async Task HandleAsync(Event eventModel, CancellationToken ct)
     {
+        logger.LogInformation("Handling event for order item status update {OrderId} {ItemId}", eventModel.OrderId, eventModel.ItemId);
+        
         var message = new Message<string, Event>
         {
             Key = Guid.NewGuid().ToString(),

@@ -6,6 +6,12 @@ using Order.Api.Features.Order.UpdateItemStatus;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddLogging(lb =>
+{
+    lb.AddConsole();
+    lb.SetMinimumLevel(LogLevel.Information);
+});
+
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDb"));
 builder.Services.AddMongoDbContext(new Dictionary<Type, string>
 {

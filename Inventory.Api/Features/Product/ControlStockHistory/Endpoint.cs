@@ -3,7 +3,7 @@ using FastEndpoints;
 
 namespace Inventory.Api.Features.Product.ControlStockHistory
 {
-    internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
+    internal sealed class Endpoint(IDbContext dbContext, ILogger<Endpoint> logger) : Endpoint<Request, Response, Mapper>
     {
         public override void Configure()
         {
@@ -13,6 +13,8 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
 
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
+            logger.LogInformation("Received request to control stock history for product {Id}", req.Id);
+            
             var product = dbContext.GetById<ProductEntity>(req.Id);
             var operationType = (ProductEntity.ProductStockEntity.StockOperationType) req.OperationType;
 
@@ -40,6 +42,8 @@ namespace Inventory.Api.Features.Product.ControlStockHistory
                 product.ProductStockHistory.Add(stockHistory);
 
                 dbContext.Update(product.Id, product);
+                
+                logger.LogInformation("Stock history for product {Id} updated", product.Id);
                 
                 var @event = new Event
                 {

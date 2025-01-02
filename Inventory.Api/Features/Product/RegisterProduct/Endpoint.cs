@@ -3,7 +3,7 @@ using Common.Data;
 
 namespace Inventory.Api.Features.Product.RegisterProduct
 {
-    internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
+    internal sealed class Endpoint(IDbContext dbContext, ILogger<Endpoint> logger) : Endpoint<Request, Response, Mapper>
     {
         public override void Configure()
         {
@@ -13,6 +13,8 @@ namespace Inventory.Api.Features.Product.RegisterProduct
 
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
+            logger.LogInformation("Received request to register product");
+            
             var entity = Map.ToEntity(req);
 
             entity.Id = Guid.NewGuid().ToString();
@@ -26,6 +28,8 @@ namespace Inventory.Api.Features.Product.RegisterProduct
             ];
 
             dbContext.Add(entity);
+            
+            logger.LogInformation("Saving product {Id}", entity.Id);
 
             var response = Map.FromEntity(entity);
 

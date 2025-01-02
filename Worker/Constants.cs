@@ -2,7 +2,7 @@ namespace Worker;
 
 public class Constants
 {
-    public const string OrderRegisteredTopic = "order-registered";
-    public const string ProductStockUpdatedTopic = "product-stock-updated";
-    public const string OrderItemStatusUpdated = "order-item-status-updated";
+    public const string OrderRegisteredTopicName = "order-registered";
+    public const string ProductStockUpdatedTopicName = "product-stock-updated";
+    public const string OrderItemStatusUpdatedTopicName = "order-item-status-updated";
 }

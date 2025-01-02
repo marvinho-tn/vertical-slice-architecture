@@ -1,33 +1,40 @@
 using Common.Serialization;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
-using Refit;
 using Worker.Events.Order.ItemStatusUpdated;
+using Worker.Http;
 
 namespace Worker.Features.Order.ItemStatusUpdated;
 
 internal sealed class Consumer(
     IOptions<ApisConfig> apisConfig,
+    IOptions<ConsumerConfig> consumerConfig,
     IOptions<NotificationConfig> notificationConfig,
-    IConsumer<string, Message> consumer) : IHostedService
+    ILogger<Consumer> logger) : BackgroundService
 {
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
-
-    public async Task StartAsync(CancellationToken cancellationToken)
+    private readonly IConsumer<string, Message> _consumer = new ConsumerBuilder<string, Message>(consumerConfig.Value)
+        .SetValueDeserializer(new CustomJsonSerializer<Message>())
+        .Build();
+    
+    protected override async Task ExecuteAsync(CancellationToken ct)
     {
-        consumer.Subscribe(Constants.OrderItemStatusUpdated);
+        _consumer.Subscribe(Constants.OrderItemStatusUpdatedTopicName);
 
-        while (!_cancellationTokenSource.Token.IsCancellationRequested)
+        while (!ct.IsCancellationRequested)
         {
-            var consumeResult = consumer.Consume(_cancellationTokenSource.Token);
+            var consumeResult = _consumer.Consume(ct);
+            
+            logger.LogInformation($"{nameof(Constants.OrderItemStatusUpdatedTopicName)} consumer started");
 
             if (consumeResult.Message is not null)
             {
+                logger.LogInformation("Consumed message {0} from {1}", consumeResult.Message.Key, Constants.OrderItemStatusUpdatedTopicName);
+                
                 var message = consumeResult.Message.Value;
 
                 if (message.Status == 3)
                 {
-                    var service = RestService.For<INotificationApi>(apisConfig.Value.NotificationApi.BaseUrl);
+                    var service = HttpExtensions.CreateHttpService<INotificationApi>(apisConfig.Value.NotificationApi.BaseUrl);
                     
                     await service.SendOutOfStockNotificationAsync(message.ItemId, new SendOutOfStockNotificationRequest
                     {
@@ -35,30 +42,22 @@ internal sealed class Consumer(
                     });
                 }
 
-                consumer.Commit(consumeResult);
+                _consumer.Commit(consumeResult);
             }
         }
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public override void Dispose()
     {
-        consumer.Close();
-        consumer.Dispose();
-
-        return Task.CompletedTask;
+        _consumer.Close();
+        _consumer.Dispose();
     }
 }
 
 internal static class DependencyConfiguration
 {
-    public static void AddOrderItemStatusUpdatedConsumer(this IServiceCollection services, IConfiguration configuration)
+    public static void AddOrderItemStatusUpdatedConsumer(this IServiceCollection services)
     {
-        services.AddTransient<IConsumer<string, Message>>(sp =>
-            new ConsumerBuilder<string, Message>(
-                    configuration.GetSection("Kafka:Consumer").Get<ConsumerConfig>())
-                .SetValueDeserializer(new CustomJsonSerializer<Message>())
-                .Build());
-
         services.AddHostedService<Consumer>();
     }
 }

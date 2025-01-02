@@ -15,10 +15,15 @@ internal interface IEmailService
     Task SendEmailAsync(string toEmail, string subject, string content);
 }
 
-internal class EmailService(IOptions<EmailConfig> emailConfig, ISendGridClient client) : IEmailService
+internal class EmailService(
+    IOptions<EmailConfig> emailConfig,
+    ILogger<EmailService> logger,
+    ISendGridClient client) : IEmailService
 {
     public async Task SendEmailAsync(string toEmail, string subject, string content)
     {
+        logger.LogInformation($"Sending email to {toEmail}");
+        
         var from = new EmailAddress(emailConfig.Value.Sender, emailConfig.Value.User);
         var to = new EmailAddress(toEmail);
         var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, content);
@@ -39,19 +44,19 @@ internal static class EmailExtensions
             return new SendGridClient(apiKey);
         });
         services.AddTransient<IEmailService, EmailService>();
-        
+
         return services;
     }
-    
+
     public static string GetEmailTemplate(this object model, string templatePath)
     {
         var template = File.ReadAllText(templatePath);
-        
+
         foreach (var prop in model.GetType().GetProperties())
         {
             template = template.Replace($"@Model.{prop.Name}", prop.GetValue(model)?.ToString());
         }
-        
+
         return template;
     }
 }

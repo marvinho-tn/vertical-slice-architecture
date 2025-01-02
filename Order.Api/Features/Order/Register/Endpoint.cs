@@ -3,7 +3,7 @@ using FastEndpoints;
 
 namespace Order.Api.Features.Order.Register
 {
-    internal sealed class Endpoint(IDbContext dbContext) : Endpoint<Request, Response, Mapper>
+    internal sealed class Endpoint(IDbContext dbContext, ILogger<Endpoint> logger) : Endpoint<Request, Response, Mapper>
     {
         public override void Configure()
         {
@@ -13,6 +13,8 @@ namespace Order.Api.Features.Order.Register
 
         public override async Task HandleAsync(Request req, CancellationToken ct)
         {
+            logger.LogInformation("Received request for register order");
+            
             var entity = Map.ToEntity(req);
 
             entity.Id = Guid.NewGuid().ToString();
@@ -20,6 +22,8 @@ namespace Order.Api.Features.Order.Register
             entity.Updated = DateTime.UtcNow;
 
             dbContext.Add(entity);
+            
+            logger.LogInformation("Saving order {Id}", entity.Id);
 
             var @event = new Event
             {

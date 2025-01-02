@@ -1,81 +1,85 @@
 using Common.Serialization;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
-using Refit;
 using Worker.Events.Product.StockUpdated;
+using Worker.Http;
 
 namespace Worker.Features.Product.StockUpdated;
 
-internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string, Message> consumer) : IHostedService
+internal sealed class Consumer(
+    IOptions<ApisConfig> apisConfig,
+    IOptions<ConsumerConfig> consumerConfig,
+    ILogger<Consumer> logger) : BackgroundService
 {
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly IConsumer<string, Message> _consumer = new ConsumerBuilder<string, Message>(consumerConfig.Value)
+        .SetValueDeserializer(new CustomJsonSerializer<Message>())
+        .Build();
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken ct)
     {
-        consumer.Subscribe(Constants.ProductStockUpdatedTopic);
+        _consumer.Subscribe(Constants.ProductStockUpdatedTopicName);
 
-        while (!_cancellationTokenSource.Token.IsCancellationRequested)
+        while (!ct.IsCancellationRequested)
         {
-            var consumeResult = consumer.Consume(_cancellationTokenSource.Token);
+            var consumeResult = _consumer.Consume(ct);
+
+            logger.LogInformation($"{nameof(Constants.ProductStockUpdatedTopicName)} consumer started");
 
             if (consumeResult.Message is not null)
             {
+                logger.LogInformation("Consumed message {0} from {1}", consumeResult.Message.Key,
+                    Constants.ProductStockUpdatedTopicName);
+
                 var message = consumeResult.Message.Value;
 
                 if (message.OperationType == 1)
                 {
-                    var orderService = RestService.For<IOrderApi>(apisConfig.Value.OrderApi.BaseUrl);
+                    var orderService = HttpExtensions.CreateHttpService<IOrderApi>(apisConfig.Value.OrderApi.BaseUrl);
                     var orders = await orderService.GetOrdersByStatusAndProductIdAsync(3, message.ProductID);
-                    var inventoryService = RestService.For<IInventoryApi>(apisConfig.Value.InventoryApi.BaseUrl);
+                    var inventoryService = HttpExtensions.CreateHttpService<IInventoryApi>(apisConfig.Value.InventoryApi.BaseUrl);
 
                     foreach (var order in orders)
                     {
                         var itemsCount = order.Items.Count(i => i == message.ProductID);
-                        var request = new UpdateStockHistoryRequest
+                        var updateStockHistoryRequest = new UpdateStockHistoryRequest
                         {
                             OperationType = 2,
                             Quantity = itemsCount
                         };
-                        var response = await inventoryService.UpdateStockHistoryAsync(message.ProductID, request);
+                        var updateStockHistoryResponse = await inventoryService.UpdateStockHistoryAsync(message.ProductID, updateStockHistoryRequest);
                         var itemStatus = 2;
 
-                        if (response is null)
+                        if (updateStockHistoryResponse is null)
                         {
                             itemStatus = 3;
                         }
-                        
-                        await orderService.UpdateOrderStatusAsync(order.Id, new UpdateOrderStatusRequest
+
+                        var updateOrderStatusRequest = new UpdateOrderStatusRequest
                         {
                             ItemId = message.ProductID,
                             Status = itemStatus
-                        });
+                        };
+                        
+                        await orderService.UpdateOrderStatusAsync(order.Id, updateOrderStatusRequest);
                     }
                 }
 
-                consumer.Commit(consumeResult);
+                _consumer.Commit(consumeResult);
             }
         }
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public override void Dispose()
     {
-        consumer.Close();
-        consumer.Dispose();
-
-        return Task.CompletedTask;
+        _consumer.Close();
+        _consumer.Dispose();
     }
 }
 
 internal static class DependencyConfiguration
 {
-    public static void AddProductStockUpdatedConsumer(this IServiceCollection services, IConfiguration configuration)
+    public static void AddProductStockUpdatedConsumer(this IServiceCollection services)
     {
-        services.AddTransient<IConsumer<string, Message>>(sp =>
-            new ConsumerBuilder<string, Message>(
-                    configuration.GetSection("Kafka:Consumer").Get<ConsumerConfig>())
-                .SetValueDeserializer(new CustomJsonSerializer<Message>())
-                .Build());
-
         services.AddHostedService<Consumer>();
     }
 }
