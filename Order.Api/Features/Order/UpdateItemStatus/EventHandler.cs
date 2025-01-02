@@ -27,7 +27,7 @@ internal sealed class EventHandler(IProducer<string, Event> producer) : IEventHa
 
 internal static class DependencyConfiguration
 {
-    public static IServiceCollection AddOrderRegisteredEvent(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection OrderItemStatusUpdatedEvent(this IServiceCollection services, IConfiguration configuration)
     {
         return services.AddTransient<IProducer<string, Event>>(sp =>
             new ProducerBuilder<string, Event>(

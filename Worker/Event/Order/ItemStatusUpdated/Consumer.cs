@@ -1,7 +1,7 @@
 using Common.Serialization;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
-using RestSharp;
+using Refit;
 
 namespace Worker.Event.Order.ItemStatusUpdated;
 
@@ -26,15 +26,12 @@ internal sealed class Consumer(
 
                 if (message.Status == 3)
                 {
-                    var client = new RestClient(apisConfig.Value.NotificationApi.BaseUrl);
-                    var request = new RestRequest($"/products/{message.ItemId}/out-of-stock", Method.Put);
-
-                    request.AddJsonBody(new
+                    var service = RestService.For<INotificationApi>(apisConfig.Value.NotificationApi.BaseUrl);
+                    
+                    await service.SendOutOfStockNotificationAsync(message.ItemId, new SendOutOfStockNotificationRequest
                     {
                         To = notificationConfig.Value.StockManager
                     });
-
-                    await client.ExecuteAsync(request, _cancellationTokenSource.Token);
                 }
 
                 consumer.Commit(consumeResult);

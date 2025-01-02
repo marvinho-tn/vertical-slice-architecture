@@ -2,7 +2,7 @@ using System.Text.Json;
 using Common.Serialization;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
-using RestSharp;
+using Refit;
 
 namespace Worker.Event.Product.StockUpdated;
 
@@ -24,40 +24,34 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
 
                 if (message.OperationType == 1)
                 {
-                    var orderRestClient = new RestClient(apisConfig.Value.OrderApi.BaseUrl);
-                    var orderRequest = new RestRequest($"orders/status/3/products/{message.ProductID}");
-                    var orderResponse = await orderRestClient.ExecuteAsync(orderRequest, _cancellationTokenSource.Token);
+                    var orderService = RestService.For<IOrderApi>(apisConfig.Value.OrderApi.BaseUrl);
+                    var orders = await orderService.GetOrdersByStatusAndProductIdAsync(3, message.ProductID);
+                    var inventoryService = RestService.For<IInventoryApi>(apisConfig.Value.InventoryApi.BaseUrl);
 
-                    if (orderResponse.IsSuccessStatusCode)
+                    foreach (var order in orders)
                     {
-                        var orders = JsonSerializer.Deserialize<OrderResponse[]>(orderResponse.Content);
-                        var inventoryRestClient = new RestClient(apisConfig.Value.InventoryApi.BaseUrl);
-
-                        foreach (var order in orders)
+                        var itemsCount = order.Items.Count(i => i == message.ProductID);
+                        var request = new UpdateStockHistoryRequest
                         {
-                            var itemsCount = order.Items.Count(i => i == message.ProductID);
-                            var inventoryRequest = new RestRequest($"/products/{message.ProductID}/stock-history", Method.Put);
+                            OperationType = 2,
+                            Quantity = itemsCount
+                        };
+                        var response = await inventoryService.UpdateStockHistoryAsync(message.ProductID, request);
+                        var itemStatus = 2;
 
-                            inventoryRequest.AddJsonBody(new
-                            {
-                                OperationType = 2,
-                                Quantity = itemsCount
-                            });
-
-                            var inventoryResponse = await inventoryRestClient.ExecuteAsync(inventoryRequest, _cancellationTokenSource.Token);
-
-                            if (inventoryResponse.IsSuccessStatusCode)
-                            {
-                                await UpdateOrderStatusAsync(order.Id, 2, message.ProductID);
-                            }
-                            else
-                            {
-                                await UpdateOrderStatusAsync(order.Id, 3, message.ProductID);
-                            }
+                        if (response is null)
+                        {
+                            itemStatus = 3;
                         }
+                        
+                        await orderService.UpdateOrderStatusAsync(order.Id, new UpdateOrderStatusRequest
+                        {
+                            ItemId = message.ProductID,
+                            Status = itemStatus
+                        });
                     }
                 }
-                
+
                 consumer.Commit(consumeResult);
             }
         }
@@ -69,21 +63,6 @@ internal sealed class Consumer(IOptions<ApisConfig> apisConfig, IConsumer<string
         consumer.Dispose();
 
         return Task.CompletedTask;
-    }
-
-    private async Task UpdateOrderStatusAsync(string orderId, int orderStatus, string itemId)
-    {
-        var restClient = new RestClient(apisConfig.Value.OrderApi.BaseUrl);
-        var request = new RestRequest($"/orders/{orderId}/status", Method.Put);
-
-        request.AddJsonBody(new
-        {
-            Id = orderId,
-            ItemId = itemId,
-            Status = orderStatus,
-        });
-
-        await restClient.ExecuteAsync(request, _cancellationTokenSource.Token);
     }
 }
 

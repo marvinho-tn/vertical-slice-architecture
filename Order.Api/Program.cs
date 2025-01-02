@@ -2,6 +2,7 @@ using Common.Data;
 using FastEndpoints;
 using Order.Api.Features.Order;
 using Order.Api.Features.Order.Create;
+using Order.Api.Features.Order.UpdateItemStatus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ builder.Services.AddMongoDbContext(new Dictionary<Type, string>
 });
 
 builder.Services.AddOrderRegisteredEvent(builder.Configuration);
+builder.Services.OrderItemStatusUpdatedEvent(builder.Configuration);
 builder.Services.AddFastEndpoints();
 
 var app = builder.Build();
